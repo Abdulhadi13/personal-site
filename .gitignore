@@ -16,9 +16,3 @@ dist/
 *.pem
 *.key
 *.log
-
-__pycache__/
-*.pyc
-
-/deploy/config.env
-/deploy/state/

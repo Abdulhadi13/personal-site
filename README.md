@@ -41,29 +41,4 @@ The original `styling_guide/kit/` remains unchanged. Its CSS tokens, component s
 
 See `PRODUCT.md` for the agreed behavior and `DESIGN.md` for the implemented visual system. When replacing placeholders, retain the shared layout and localized route structure.
 
-## Development and deployment
-
-Use short feature branches and pull requests into `main`. CI checks the build,
-production container, localized routes, assets, and deployment failure handling.
-Successful changes on `main` publish a private GHCR image for AMD64 and ARM64.
-Once configured, the release workflow deploys its immutable digest to the VPS
-through a restricted SSH command. Nginx Proxy Manager handles the domain and TLS.
-
-Deployment starts disabled until the VPS, credentials, DNS, and proxy are ready.
-See [the deployment runbook](deploy/README.md) for bootstrap, GitHub settings,
-normal releases, rollback, credential renewal, and troubleshooting.
-
-Local deployment checks:
-
-```sh
-python3 -m unittest discover -s tests -v
-bash -n deploy/deploy.sh deploy/ssh-entrypoint.sh
-docker build --build-arg RELEASE_SHA=local -t personal-site:local .
-docker run -d --name personal-site-check -p 127.0.0.1:8080:80 personal-site:local
-node scripts/smoke.mjs http://127.0.0.1:8080 local
-docker rm -f personal-site-check
-```
-
-Wait for the container to become healthy before running the smoke check.
-The default production origin is `https://example.cloud`; change it in
-`astro.config.mjs` and the GitHub `SITE_URL` variable if using a different domain.
+This setup is local only. No hosting service or deployment is configured.
