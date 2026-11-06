@@ -24,6 +24,7 @@ jobs:
           docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro" -w /repo rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
           docker run --rm --entrypoint shellcheck -v "$GITHUB_WORKSPACE:/repo:ro" -w /repo rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 deploy/deploy.sh deploy/ssh-entrypoint.sh
       - run: python3 -m unittest discover -s tests -v
+      - run: node --test tests/*.test.mjs
   image:
     needs: validate
     runs-on: ubuntu-latest
@@ -74,13 +75,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OWNER: ${{ github.repository_owner }}
           OWNER_TYPE: ${{ github.event.repository.owner.type }}
-        run: |
-          set -euo pipefail
-          namespace=users
-          if [[ $OWNER_TYPE == Organization ]]; then namespace=orgs; fi
-          visibility=$(gh api --paginate "/$namespace/$OWNER/packages?package_type=container" \
-            --jq '.[] | select(.name == "personal-site") | .visibility')
-          [[ -z $visibility || $visibility == private ]] || { echo 'Existing GHCR package must be private.' >&2; exit 1; }
+        run: node scripts/check-package-visibility.mjs --allow-missing
       - name: Publish multi-platform image
         id: publish
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
@@ -98,12 +93,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OWNER: ${{ github.repository_owner }}
           OWNER_TYPE: ${{ github.event.repository.owner.type }}
-        run: |
-          set -euo pipefail
-          namespace=users
-          if [[ $OWNER_TYPE == Organization ]]; then namespace=orgs; fi
-          visibility=$(gh api "/$namespace/$OWNER/packages/container/personal-site" --jq .visibility)
-          [[ $visibility == private ]] || { echo 'GHCR package must be private.' >&2; exit 1; }
+        run: node scripts/check-package-visibility.mjs
       - name: Record release for bootstrap and troubleshooting
         env:
           IMAGE: ${{ steps.name.outputs.image }}

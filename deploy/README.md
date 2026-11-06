@@ -29,9 +29,11 @@ script only accepts `ghcr.io/<owner>/personal-site`.
 Leave repository variable `DEPLOY_ENABLED` unset during setup. The first push
 builds and publishes the image but skips the deploy job. Check the Release run
 and package settings: the `personal-site` GHCR package must be **private**, with
-the source repository granted Actions access. The workflow also checks package
-visibility before deployment. Configure Actions with read/write packages access
-through its workflow permissions; no publish PAT is required.
+the source repository granted Actions access. The workflow queries the specific
+package before publication, allowing HTTP 404 for a new package, and requires
+private visibility after publication. Other API errors fail the release;
+account-wide package listing is not used. Configure Actions with read/write
+packages access through its workflow permissions; no publish PAT is required.
 
 If your real domain differs from `example.cloud`, change `site` in
 `astro.config.mjs` before publishing and use that domain throughout this runbook.
