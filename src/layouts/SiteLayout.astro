@@ -1,0 +1,92 @@
+---
+import { pagePath, pages, translations, type Locale, type Page } from '../i18n';
+import '../styles/global.css';
+
+interface Props {
+  locale: Locale;
+  page: Page;
+}
+
+const { locale, page } = Astro.props;
+const text = translations[locale];
+const otherLocale = locale === 'en' ? 'ar' : 'en';
+---
+
+<!doctype html>
+<html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} data-page={page}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={`${text.name} — ${text.construction}`} />
+    <title>{text.pages[page]} — {text.name}</title>
+    <script is:inline>
+      (() => {
+        let savedTheme;
+        let savedLanguage;
+        try {
+          savedTheme = localStorage.getItem('af-theme');
+          savedLanguage = localStorage.getItem('af-language');
+        } catch {}
+
+        document.documentElement.dataset.theme =
+          savedTheme === 'light' || savedTheme === 'dark'
+            ? savedTheme
+            : window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+
+        if (location.pathname === '/' && savedLanguage === 'ar') {
+          location.replace('/ar/' + location.search + location.hash);
+        }
+      })();
+    </script>
+  </head>
+  <body class="sg-root">
+    <a class="skip-link sg-button" href="#main">{text.skipToContent}</a>
+    <div class="site-shell flex min-h-dvh flex-col">
+      <header class="site-header">
+        <div class="sg-container header-inner grid items-center gap-x-6 gap-y-4">
+          <a class="brand" href={pagePath(locale, 'home')}>{text.name}</a>
+          <nav class="sg-nav" aria-label={text.navigation}>
+            {pages.map((item) => (
+              <a href={pagePath(locale, item)} aria-current={item === page ? 'page' : undefined}>
+                {text.pages[item]}
+              </a>
+            ))}
+          </nav>
+          <div class="site-controls flex items-center gap-2">
+            <a
+              class="sg-button sg-button--quiet language-switch"
+              href={pagePath(otherLocale, page)}
+              lang={otherLocale}
+              hreflang={otherLocale}
+              aria-label={text.switchLanguage}
+              data-language={otherLocale}
+            >
+              {otherLocale === 'ar' ? 'العربية' : 'English'}
+            </a>
+            <button
+              class="sg-button sg-button--quiet theme-toggle"
+              type="button"
+              aria-label={text.darkTheme}
+              title={text.darkTheme}
+              data-light-label={text.lightTheme}
+              data-dark-label={text.darkTheme}
+              hidden
+            >
+              <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
+              </svg>
+              <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20.9 13.2A9 9 0 0 1 10.8 3.1 9 9 0 1 0 20.9 13.2Z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+      <main id="main" class="main-content grid flex-1 place-items-center" tabindex="-1">
+        <slot />
+      </main>
+    </div>
+    <script src="../scripts/preferences.ts"></script>
+  </body>
+</html>

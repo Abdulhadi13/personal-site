@@ -1,0 +1,25 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Construction from '../components/Construction.astro';
+import { locales, pagePath, pages, type Locale, type Page } from '../i18n';
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+export const getStaticPaths = (() =>
+  locales.flatMap((locale) =>
+    pages.map((page) => ({
+      params: { path: pagePath(locale, page).slice(1, -1) || undefined },
+      props: { locale, page },
+    })),
+  )) satisfies GetStaticPaths;
+
+interface Props {
+  locale: Locale;
+  page: Page;
+}
+
+const { locale, page } = Astro.props;
+---
+
+<SiteLayout locale={locale} page={page}>
+  <Construction locale={locale} />
+</SiteLayout>

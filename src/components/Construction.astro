@@ -1,0 +1,11 @@
+---
+import { translations, type Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<h1 class="sg-heading construction-heading">{translations[locale].construction}</h1>

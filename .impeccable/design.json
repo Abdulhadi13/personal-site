@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-06T14:09:15.428035+00:00",
+  "title": "Design System: Abdulhadi Fatani",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Primary blue",
+        "canonical": "#4C638B"
+      },
+      "dark-primary": {
+        "role": "primary",
+        "displayName": "Dark-theme primary blue",
+        "canonical": "#A6BDE4"
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper background",
+        "canonical": "#F7F7F2"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink text",
+        "canonical": "#262D3B"
+      }
+    },
+    "typographyMeta": {
+      "headline": {
+        "displayName": "Construction heading",
+        "purpose": "Single centered page heading; Arabic heading line-height is 1.5."
+      },
+      "body-arabic": {
+        "displayName": "Arabic body",
+        "purpose": "Arabic-first font stack and line-height."
+      }
+    },
+    "motion": [
+      {
+        "name": "sg-duration-fast",
+        "value": "140ms",
+        "purpose": "Button background transitions; disabled for reduced motion."
+      },
+      {
+        "name": "sg-ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Button background transition easing."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "header-wrap",
+        "value": "48rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Section navigation",
+      "kind": "nav",
+      "refersTo": "navigation-link",
+      "description": "Four section links with stable medium weight across current-page states.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><a href=\"/\" aria-current=\"page\">Home</a><a href=\"/projects/\">Projects</a><a href=\"/blogs/\">Blogs</a><a href=\"/about/\">About</a></nav>",
+      "css": ".ds-nav{display:flex;justify-content:center;flex-wrap:wrap;gap:var(--sg-space-2,.5rem);font-family:var(--sg-font-sans,\"IBM Plex Sans\",\"IBM Plex Sans Arabic\",sans-serif);font-size:var(--sg-font-size-md,1rem);line-height:var(--sg-line-height,1.65);}.ds-nav a{font-weight:500;display:inline-flex;align-items:center;min-block-size:var(--sg-control-height,2.75rem);padding:var(--sg-space-2,.5rem) var(--sg-space-3,.75rem);border-radius:var(--sg-radius-sm,4px);text-decoration:none;color:var(--sg-text-muted,#606774);}.ds-nav a:hover{background:var(--sg-surface-muted,#EEEFEB);color:var(--sg-text,#262D3B);}.ds-nav a[aria-current]{color:var(--sg-primary,#4C638B);background:var(--sg-primary-soft,#E9EEF6);}.ds-nav:lang(ar){font-family:var(--sg-font-arabic,\"IBM Plex Sans Arabic\",\"IBM Plex Sans\",sans-serif);line-height:var(--sg-line-height-ar,1.9);}@media(max-width:48rem){.ds-nav{gap:var(--sg-space-1,.25rem);}}.ds-nav a:focus-visible,.ds-quiet:focus-visible{outline:2px solid var(--sg-focus,#4C638B);outline-offset:4px;}"
+    },
+    {
+      "name": "Language control",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Quiet link to the equivalent section in the other locale.",
+      "html": "<a class=\"ds-quiet\" href=\"/ar/\" lang=\"ar\" hreflang=\"ar\" aria-label=\"Switch to Arabic\">العربية</a>",
+      "css": ".ds-quiet{display:inline-flex;justify-content:center;align-items:center;gap:var(--sg-space-2,.5rem);min-block-size:var(--sg-control-height,2.75rem);padding:var(--sg-space-2,.5rem) var(--sg-space-4,1rem);border:1px solid transparent;border-radius:var(--sg-radius-sm,4px);background:transparent;color:var(--sg-primary,#4C638B);font-family:var(--sg-font-sans,\"IBM Plex Sans\",\"IBM Plex Sans Arabic\",sans-serif);font-size:var(--sg-font-size-md,1rem);font-weight:500;line-height:1.5;text-decoration:none;cursor:pointer;transition:background var(--sg-duration-fast,140ms) var(--sg-ease,cubic-bezier(.16,1,.3,1));}.ds-quiet:hover:not(:disabled){background:var(--sg-surface-muted,#EEEFEB);}.ds-quiet:active:not(:disabled){background:var(--sg-primary-active,#304567);}.ds-quiet:lang(ar){font-family:var(--sg-font-arabic,\"IBM Plex Sans Arabic\",\"IBM Plex Sans\",sans-serif);}.ds-quiet:focus-visible{outline:2px solid var(--sg-focus,#4C638B);outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-quiet{transition:none;}}@media(max-width:48rem){.ds-quiet{padding-inline:var(--sg-space-2,.5rem);}}"
+    },
+    {
+      "name": "Theme control",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Square quiet button; snippet shows the light-theme icon. Switching requires the site preference script.",
+      "html": "<button class=\"ds-quiet ds-theme\" type=\"button\" aria-label=\"Switch to dark mode\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.75\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20.9 13.2A9 9 0 0 1 10.8 3.1 9 9 0 1 0 20.9 13.2Z\" /></svg></button>",
+      "css": ".ds-quiet{display:inline-flex;justify-content:center;align-items:center;gap:var(--sg-space-2,.5rem);min-block-size:var(--sg-control-height,2.75rem);padding:var(--sg-space-2,.5rem) var(--sg-space-4,1rem);border:1px solid transparent;border-radius:var(--sg-radius-sm,4px);background:transparent;color:var(--sg-primary,#4C638B);font-family:var(--sg-font-sans,\"IBM Plex Sans\",\"IBM Plex Sans Arabic\",sans-serif);font-size:var(--sg-font-size-md,1rem);font-weight:500;line-height:1.5;text-decoration:none;cursor:pointer;transition:background var(--sg-duration-fast,140ms) var(--sg-ease,cubic-bezier(.16,1,.3,1));}.ds-quiet:hover:not(:disabled){background:var(--sg-surface-muted,#EEEFEB);}.ds-quiet:active:not(:disabled){background:var(--sg-primary-active,#304567);}.ds-quiet:lang(ar){font-family:var(--sg-font-arabic,\"IBM Plex Sans Arabic\",\"IBM Plex Sans\",sans-serif);}.ds-quiet:focus-visible{outline:2px solid var(--sg-focus,#4C638B);outline-offset:4px;}@media(prefers-reduced-motion:reduce){.ds-quiet{transition:none;}}.ds-theme{inline-size:var(--sg-control-height,2.75rem);padding:var(--sg-space-2,.5rem);}.ds-theme svg{flex-shrink:0;}"
+    }
+  ],
+  "narrative": {
+    "overview": "The supplied style kit is the visual authority. This record captures its implemented subset: bilingual typography, semantic light and dark colors, quiet controls, and section navigation. The source CSS in `styling_guide/kit/` and `src/styles/global.css` remains authoritative when this snapshot differs.",
+    "keyCharacteristics": [
+      "Restrained typography and borders.",
+      "Equivalent English and Arabic presentation.",
+      "Visible navigation and preference controls."
+    ],
+    "rules": [],
+    "dos": [
+      "Do reuse the supplied kit's semantic variables and local fonts.",
+      "Do preserve equivalent English and Arabic layouts, labels, and focus visibility."
+    ],
+    "donts": [
+      "Don't modify the supplied style kit to create a competing token system.",
+      "Don't treat unused kit components or colors as implemented site patterns."
+    ]
+  }
+}

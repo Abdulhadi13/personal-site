@@ -1,0 +1,18 @@
+node_modules/
+dist/
+.astro/
+.impeccable/review/
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# Local credentials and deployment state
+.agents/
+.codex/
+.aws/
+.ssh/
+.secrets/
+*.pem
+*.key
+*.log

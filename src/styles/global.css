@@ -1,0 +1,125 @@
+@import '../../styling_guide/kit/fonts.css';
+@import '../../styling_guide/kit/tokens.css';
+@import '../../styling_guide/kit/components.css';
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/* The kit supplies the base styles; Tailwind Preflight is intentionally omitted. */
+html,
+body {
+  margin: 0;
+  min-inline-size: 20rem;
+}
+
+html {
+  background: var(--sg-bg);
+}
+
+.site-shell {
+  min-block-size: 100svh;
+}
+
+.site-header {
+  border-block-end: 1px solid var(--sg-border);
+}
+
+.header-inner {
+  grid-template-columns: auto 1fr auto;
+}
+
+.brand {
+  color: var(--sg-text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.brand:hover {
+  color: var(--sg-primary);
+}
+
+.sg-nav {
+  justify-self: center;
+  justify-content: center;
+}
+
+.sg-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--sg-control-height);
+  /* Keep link widths stable when aria-current moves to another page. */
+  font-weight: 500;
+}
+
+.site-controls {
+  justify-self: end;
+}
+
+.theme-toggle {
+  inline-size: var(--sg-control-height);
+  padding: var(--sg-space-2);
+}
+
+/* Reserve the control's space while its script initializes. Without JS, the
+   bootstrap never sets data-theme and the native hidden behavior is preserved. */
+html[data-theme] .theme-toggle[hidden] {
+  display: inline-flex !important;
+  visibility: hidden;
+}
+
+.theme-toggle svg {
+  flex-shrink: 0;
+}
+
+.sun-icon,
+[data-theme='dark'] .moon-icon {
+  display: none;
+}
+
+[data-theme='dark'] .sun-icon {
+  display: block;
+}
+
+.main-content {
+  padding: var(--sg-space-12) var(--sg-space-6);
+}
+
+.construction-heading {
+  max-inline-size: var(--sg-measure);
+  font-size: clamp(var(--sg-font-size-xl), 5vw, var(--sg-font-size-2xl));
+  text-align: center;
+}
+
+.skip-link {
+  position: fixed;
+  inset-block-start: var(--sg-space-4);
+  inset-inline-start: var(--sg-space-4);
+  z-index: 10;
+  transform: translateY(calc(-100% - var(--sg-space-8)));
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+@media (max-width: 48rem) {
+  .header-inner {
+    grid-template-columns: 1fr auto;
+    column-gap: var(--sg-space-2);
+    padding: var(--sg-space-4);
+  }
+
+  .sg-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    gap: var(--sg-space-1);
+  }
+
+  .site-controls {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .language-switch {
+    padding-inline: var(--sg-space-2);
+  }
+}

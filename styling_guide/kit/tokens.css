@@ -1,0 +1,93 @@
+/* Generated from tokens.json. Run npm run build. */
+:root, .sg-root {
+  --sg-font-sans: "IBM Plex Sans", "IBM Plex Sans Arabic", sans-serif;
+  --sg-font-arabic: "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif;
+  --sg-font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  --sg-font-size-xs: 0.75rem;
+  --sg-font-size-sm: 0.875rem;
+  --sg-font-size-md: 1rem;
+  --sg-font-size-lg: 1.25rem;
+  --sg-font-size-xl: 1.75rem;
+  --sg-font-size-2xl: 2.5rem;
+  --sg-font-size-display: clamp(2.5rem, 5vw, 4rem);
+  --sg-line-height: 1.65;
+  --sg-line-height-ar: 1.9;
+  --sg-line-height-heading: 1.2;
+  --sg-line-height-heading-ar: 1.5;
+  --sg-space-1: 0.25rem;
+  --sg-space-2: 0.5rem;
+  --sg-space-3: 0.75rem;
+  --sg-space-4: 1rem;
+  --sg-space-6: 1.5rem;
+  --sg-space-8: 2rem;
+  --sg-space-12: 3rem;
+  --sg-space-16: 4rem;
+  --sg-space-24: 6rem;
+  --sg-radius-sm: 4px;
+  --sg-radius-md: 8px;
+  --sg-radius-lg: 12px;
+  --sg-measure: 68ch;
+  --sg-content-width: 72rem;
+  --sg-control-height: 2.75rem;
+  --sg-duration-fast: 140ms;
+  --sg-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --sg-palette-blue: #7C8EAF;
+  --sg-palette-rose: #D88DA5;
+  --sg-palette-lavender: #B5ACCF;
+  --sg-palette-paper: #F7F7F2;
+  --sg-palette-ink: #262D3B;
+}
+:root, [data-theme="light"] {
+  --sg-bg: #F7F7F2;
+  --sg-surface: #FFFFFF;
+  --sg-surface-muted: #EEEFEB;
+  --sg-text: #262D3B;
+  --sg-text-muted: #606774;
+  --sg-border: #DADDDC;
+  --sg-border-strong: #818792;
+  --sg-primary: #4C638B;
+  --sg-primary-hover: #3C5278;
+  --sg-primary-active: #304567;
+  --sg-on-primary: #FFFFFF;
+  --sg-primary-soft: #E9EEF6;
+  --sg-focus: #4C638B;
+  --sg-rose: #A83E64;
+  --sg-rose-soft: #F9EAF0;
+  --sg-lavender: #665783;
+  --sg-lavender-soft: #EEEAF5;
+  --sg-success: #266846;
+  --sg-success-soft: #E7F2EA;
+  --sg-warning: #7E5315;
+  --sg-warning-soft: #FBF0DC;
+  --sg-danger: #AE3547;
+  --sg-danger-soft: #FCECEF;
+  --sg-shadow: 0 4px 16px rgb(38 45 59 / 0.06);
+}
+[data-theme="dark"] {
+  --sg-bg: #171C25;
+  --sg-surface: #202733;
+  --sg-surface-muted: #29323F;
+  --sg-text: #EEF0F5;
+  --sg-text-muted: #B0B9C9;
+  --sg-border: #3C4758;
+  --sg-border-strong: #7F8CA1;
+  --sg-primary: #A6BDE4;
+  --sg-primary-hover: #C0D1ED;
+  --sg-primary-active: #8FAAD7;
+  --sg-on-primary: #172239;
+  --sg-primary-soft: #2D3C54;
+  --sg-focus: #BCD0F3;
+  --sg-rose: #F0A6BF;
+  --sg-rose-soft: #442C3B;
+  --sg-lavender: #C8B9E8;
+  --sg-lavender-soft: #373145;
+  --sg-success: #94D4AC;
+  --sg-success-soft: #243C31;
+  --sg-warning: #E8C283;
+  --sg-warning-soft: #403625;
+  --sg-danger: #FFA9B5;
+  --sg-danger-soft: #472D39;
+  --sg-shadow: 0 4px 16px rgb(0 0 0 / 0.16);
+}
+[data-theme="light"] { color-scheme: light; }
+[data-theme="dark"] { color-scheme: dark; }
