@@ -20,7 +20,7 @@ Establish an initial personal website for Abdulhadi Fatani (عبدالهادي �
 - Language switching retains the current section. Remember explicit language choices for future visits to the root URL; deep links retain their URL language.
 - Support light and dark themes, initially following the operating system and remembering a manual selection.
 - Keep navigation and content usable without JavaScript. Browser persistence is optional enhancement.
-- Implement and validate locally. Hosting and publication are excluded from this task.
+- Develop and validate locally; deploy static output to the owner’s VPS through GitHub Actions, private GHCR images, Docker Compose, and Nginx Proxy Manager.
 - Do not invent project entries, posts, biography, or other personal claims.
 
 ## Brand Commitments

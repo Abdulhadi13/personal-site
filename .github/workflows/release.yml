@@ -1,0 +1,159 @@
+name: Release
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: production-release
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: bash -n deploy/deploy.sh deploy/ssh-entrypoint.sh
+      - name: Validate workflows and deployment shell
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo:ro" -w /repo rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667
+          docker run --rm --entrypoint shellcheck -v "$GITHUB_WORKSPACE:/repo:ro" -w /repo rhysd/actionlint@sha256:b1934ee5f1c509618f2508e6eb47ee0d3520686341fec936f3b79331f9315667 deploy/deploy.sh deploy/ssh-entrypoint.sh
+      - run: python3 -m unittest discover -s tests -v
+  image:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      digest: ${{ steps.publish.outputs.digest }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '24'
+      - name: Image name
+        id: name
+        env:
+          REPOSITORY: ${{ github.repository }}
+        run: echo "image=ghcr.io/${REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
+      - uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
+      - uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build native image for smoke testing
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: .
+          load: true
+          tags: personal-site:test
+          build-args: RELEASE_SHA=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        run: |
+          docker run -d --name site-test -p 127.0.0.1:8080:80 personal-site:test
+          trap 'docker logs site-test; docker rm -f site-test' EXIT
+          for ((attempt=0; attempt<30; attempt++)); do
+            if curl --fail --silent http://127.0.0.1:8080/healthz; then break; fi
+            sleep 2
+          done
+          node scripts/smoke.mjs http://127.0.0.1:8080 "$RELEASE_SHA"
+      - name: Check existing package visibility before publishing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          OWNER_TYPE: ${{ github.event.repository.owner.type }}
+        run: |
+          set -euo pipefail
+          namespace=users
+          if [[ $OWNER_TYPE == Organization ]]; then namespace=orgs; fi
+          visibility=$(gh api --paginate "/$namespace/$OWNER/packages?package_type=container" \
+            --jq '.[] | select(.name == "personal-site") | .visibility')
+          [[ -z $visibility || $visibility == private ]] || { echo 'Existing GHCR package must be private.' >&2; exit 1; }
+      - name: Publish multi-platform image
+        id: publish
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.name.outputs.image }}:sha-${{ github.sha }}
+          labels: org.opencontainers.image.source=https://github.com/${{ github.repository }}
+          build-args: RELEASE_SHA=${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Require private package visibility
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          OWNER_TYPE: ${{ github.event.repository.owner.type }}
+        run: |
+          set -euo pipefail
+          namespace=users
+          if [[ $OWNER_TYPE == Organization ]]; then namespace=orgs; fi
+          visibility=$(gh api "/$namespace/$OWNER/packages/container/personal-site" --jq .visibility)
+          [[ $visibility == private ]] || { echo 'GHCR package must be private.' >&2; exit 1; }
+      - name: Record release for bootstrap and troubleshooting
+        env:
+          IMAGE: ${{ steps.name.outputs.image }}
+          DIGEST: ${{ steps.publish.outputs.digest }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          printf 'Image: %s@%s\n\nRun number: %s\n' "$IMAGE" "$DIGEST" "$RUN_NUMBER" >> "$GITHUB_STEP_SUMMARY"
+  deploy:
+    if: vars.DEPLOY_ENABLED == 'true'
+    needs: image
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy immutable image
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          DIGEST: ${{ needs.image.outputs.digest }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          set -euo pipefail
+          : "${DEPLOY_HOST:?Missing DEPLOY_HOST}" "${DEPLOY_USER:?Missing DEPLOY_USER}"
+          : "${DEPLOY_KEY:?Missing DEPLOY_SSH_KEY}" "${KNOWN_HOSTS:?Missing DEPLOY_KNOWN_HOSTS}"
+          [[ $DIGEST =~ ^sha256:[a-f0-9]{64}$ ]]
+          [[ $DEPLOY_HOST =~ ^[a-zA-Z0-9][a-zA-Z0-9.:-]*$ ]]
+          [[ $DEPLOY_USER =~ ^[a-z_][a-z0-9_-]*$ ]]
+          [[ ${DEPLOY_PORT:-22} =~ ^[0-9]{1,5}$ ]]
+          umask 077
+          mkdir -p "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_KEY" > "$HOME/.ssh/deploy_key"
+          printf '%s\n' "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          trap 'rm -f "$HOME/.ssh/deploy_key"' EXIT
+          ssh -i "$HOME/.ssh/deploy_key" -p "${DEPLOY_PORT:-22}" \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o ConnectTimeout=15 -o ServerAliveInterval=15 -o ServerAliveCountMax=4 \
+            "$DEPLOY_USER@$DEPLOY_HOST" "deploy $DIGEST $RUN_NUMBER"
+      - name: Verify public release
+        env:
+          SITE_URL: ${{ vars.SITE_URL || 'https://example.cloud' }}
+          RELEASE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          for ((attempt=0; attempt<12; attempt++)); do
+            release=$(curl --fail --silent --show-error --max-time 15 \
+              "${SITE_URL%/}/release.txt?expected=$RELEASE_SHA") || release=''
+            if [[ $release == "$RELEASE_SHA" ]]; then exit 0; fi
+            sleep 5
+          done
+          echo 'Public verification failed. Inspect DNS/TLS/proxy and use the documented rollback if needed.' >&2
+          exit 1
