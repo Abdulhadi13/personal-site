@@ -41,4 +41,15 @@ The original `styling_guide/kit/` remains unchanged. Its CSS tokens, component s
 
 See `PRODUCT.md` for the agreed behavior and `DESIGN.md` for the implemented visual system. When replacing placeholders, retain the shared layout and localized route structure.
 
-This setup is local only. No hosting service or deployment is configured.
+## Container image
+
+The image serves the generated site on port `80` and exposes `GET /healthz` for health checks. Directory routes use trailing slashes; missing pages return HTTP 404. HTML is revalidated and fingerprinted `/_astro/` assets are cached for one year. No runtime configuration or secrets are required.
+
+```sh
+docker build --build-arg VCS_REF="$(git rev-parse HEAD)" -t personal-site:local .
+docker run --rm -p 8080:80 personal-site:local
+# In another terminal:
+./scripts/smoke-image.sh http://127.0.0.1:8080
+```
+
+Pull requests to `main` build and test the image. Pushes to `main` and manual workflow runs also publish a commit-SHA-tagged image to GHCR and report its digest. Publishing does not deploy the site. Production configuration and release promotion belong in the separate operations repository; make the GHCR package public before relying on anonymous pulls.
